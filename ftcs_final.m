@@ -1,7 +1,7 @@
 clc; clear; close all
 % Parameters
-Lx = 1;         % Length of the domain in the x-direction
-Ly = 1;         % Length of the domain in the y-direction
+Lx = 15;         % Length of the domain in the x-direction
+Ly = 15;         % Length of the domain in the y-direction
 Nx = 50;        % Number of grid points in the x-direction
 Ny = 50;        % Number of grid points in the y-direction
 Nt = 500;
@@ -39,7 +39,11 @@ source_amplitude = 10;
 source_center_x = Lx / 2;
 source_center_y = Ly / 2;
 source_radius = 0.2;   % Radius of influence
-source = @(x, y, t) 1 * (1 - exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (2*source_radius^2)));
+% source = @(x, y, t) 1 * (1 - exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (2*source_radius^2)));
+r = 0.075;
+r0 = 3.1e-3;
+A = 1.3e6;
+source = @(x, y, t) A * exp(r^2 / r0^2);
 
 
 
