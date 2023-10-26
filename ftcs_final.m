@@ -2,18 +2,12 @@ clc; clear; close all
 % Parameters
 Lx = 150;         % Length of the domain in the x-direction
 Ly = 150;         % Length of the domain in the y-direction
-Nx = 50;        % Number of grid points in the x-direction
-Ny = 50;        % Number of grid points in the y-direction
-Nt = 500;
-T = 0.1;        % Total simulation time
+Nx = 5000;        % Number of grid points in the x-direction
+Ny = 500;        % Number of grid points in the y-direction
+T = 300;        % Total simulation time
 dx = Lx / (Nx - 1);
 dy = Ly / (Ny - 1);
-% dt = 0.001;      % Time step size
-dt = T / Nt;
 
-
-
-% alpha = 0.01;   % Thermal diffusivity
 k = 0.54;       % Thermal conductivity
 rho = 1066;
 c = 3763;
@@ -23,9 +17,11 @@ C_blood = 3617; % Specific heat of blood
 rho_b = 1050;
 
 % Stability
-st = (alpha*dt)/dx^2;
-m = 0.5;
-lt(st,m)
+% st = (alpha*dt)/dx^2;
+m = 0.25;
+D = (w_blood * rho_b * C_blood) / (rho * c);
+% dt = m / (alpha/dx^2+D/4)
+dt = (m*dx^2)/alpha;
 
 % Create grid
 x = linspace(0, Lx, Nx);
@@ -37,21 +33,17 @@ u = 37 * ones(Nx, Ny);
 u_new = u;
 
 % Define a source term function (e.g., a Gaussian source)
-r = 0.04;
-r0 = 20;
-A = 1.3e6;
-
+r = 75;
+r0 = 10;
+A = 0.17e6;
+% y moves in x and x moves in y
 source_center_x = Lx / 2;
 source_center_y = Ly / 2;
 
-source = @(x, y, t) A * exp(-((x - source_center_x).^2 + (y - source_center_y).^2)) / (r0^2);
-% source = @(x, y, t) A * exp( -r^2 / r0^2);
+% source = @(x, y, t) A * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (r0^2));
+% source = @(x, y, t) A * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (r0^2)) * sin(2*pi*t);
+source = @(x, y, t) A * exp( -( (x - r).^2 + (y - source_center_y).^2 ) / r0^2);
 
-
-
-
-% Time-stepping loop with boundary conditions
-for t = 0:dt:T
     % Apply boundary conditions
     u_new(1, :) = 37;  % Dirichlet boundary condition on the left
     u_new(:, 1) = 37;  % Dirichlet boundary condition on the bottom
@@ -60,12 +52,19 @@ for t = 0:dt:T
     % Neumann boundary condition on the top (zero gradient)
     u_new(:, end) = u_new(:, end-1); 
 
+
+% Time-stepping loop with boundary conditions
+for t = 0:dt:T
+
+
     % Update interior points using the FTCS method with the source term
     for i = 2:Nx-1
         for j = 2:Ny-1
+            % Source
+            source_term = source(x(i), y(j), t);
             % Pennes' equation with source term
             u_new(i, j) = u(i, j) + alpha * dt * ((u(i+1, j) - 2*u(i, j) + u(i-1, j)) / dx^2 + ...
-                (u(i, j+1) - 2*u(i, j) + u(i, j-1)) / dy^2) + dt * (source(x(i), y(j), t) - w_blood * (u(i, j) - 37) * C_blood * rho_b);
+                (u(i, j+1) - 2*u(i, j) + u(i, j-1)) / dy^2) + dt * (source_term - w_blood * (u(i, j) - 37) * C_blood * rho_b);
         end
     end
     
