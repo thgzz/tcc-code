@@ -1,14 +1,17 @@
 clc; clear; close all
 % Parameters
-Lx = 15;         % Length of the domain in the x-direction
-Ly = 15;         % Length of the domain in the y-direction
+Lx = 150;         % Length of the domain in the x-direction
+Ly = 150;         % Length of the domain in the y-direction
 Nx = 50;        % Number of grid points in the x-direction
 Ny = 50;        % Number of grid points in the y-direction
 Nt = 500;
 T = 0.1;        % Total simulation time
 dx = Lx / (Nx - 1);
 dy = Ly / (Ny - 1);
-dt = 0.001;      % Time step size
+% dt = 0.001;      % Time step size
+dt = T / Nt;
+
+
 
 % alpha = 0.01;   % Thermal diffusivity
 k = 0.54;       % Thermal conductivity
@@ -19,6 +22,10 @@ w_blood = 0.002; % Blood perfusion rate
 C_blood = 3617; % Specific heat of blood
 rho_b = 1050;
 
+% Stability
+st = (alpha*dt)/dx^2;
+m = 0.5;
+lt(st,m)
 
 % Create grid
 x = linspace(0, Lx, Nx);
@@ -29,28 +36,22 @@ y = linspace(0, Ly, Ny);
 u = 37 * ones(Nx, Ny);
 u_new = u;
 
-% Set initial condition (e.g., a Gaussian distribution)
-% u(:, :) = exp(-((X - Lx/2).^2 + (Y - Ly/2).^2) / (2*0.1^2));
-current_time = 0;
-
 % Define a source term function (e.g., a Gaussian source)
-source_rate = 0.1;
-source_amplitude = 10;
+r = 0.04;
+r0 = 20;
+A = 1.3e6;
+
 source_center_x = Lx / 2;
 source_center_y = Ly / 2;
-source_radius = 0.2;   % Radius of influence
-% source = @(x, y, t) 1 * (1 - exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (2*source_radius^2)));
-r = 0.075;
-r0 = 3.1e-3;
-A = 1.3e6;
-source = @(x, y, t) A * exp(r^2 / r0^2);
+
+source = @(x, y, t) A * exp(-((x - source_center_x).^2 + (y - source_center_y).^2)) / (r0^2);
+% source = @(x, y, t) A * exp( -r^2 / r0^2);
 
 
 
 
 % Time-stepping loop with boundary conditions
 for t = 0:dt:T
-    current_time = t;
     % Apply boundary conditions
     u_new(1, :) = 37;  % Dirichlet boundary condition on the left
     u_new(:, 1) = 37;  % Dirichlet boundary condition on the bottom
@@ -82,6 +83,17 @@ for t = 0:dt:T
     %     drawnow;
     % end
 end
+
+% Teste
+% surf(X, Y, u, 'EdgeColor', 'none');
+% xlabel('$x$', 'Interpreter', 'latex', 'FontSize', 14);
+% ylabel('$y$', 'Interpreter', 'latex', 'FontSize', 14);
+% zlabel('Temperature', 'Interpreter', 'latex', 'FontSize', 14);
+% title('2D Heat Equation Solution (FTCS Method)', 'Interpreter', 'latex', 'FontSize', 16);
+% colormap('jet');
+% colorbar;
+% view(3);
+
 
 % Final temperature distribution
 contourf(X, Y, u, 20, 'EdgeColor', 'none');

@@ -1,7 +1,7 @@
 clc; clear; close all;
 % Parameters
-Lx = 1;         % Length of the domain in the x-direction
-Ly = 1;         % Length of the domain in the y-direction
+Lx = 150;         % Length of the domain in the x-direction
+Ly = 150;         % Length of the domain in the y-direction
 Nx = 50;        % Number of grid points in the x-direction
 Ny = 50;        % Number of grid points in the y-direction
 T = 0.1;        % Total simulation time
@@ -9,6 +9,10 @@ alpha = 0.01;   % Thermal diffusivity
 dx = Lx / (Nx - 1);
 dy = Ly / (Ny - 1);
 dt = 0.001;      % Time step size
+
+w_blood = 0.002; % Blood perfusion rate
+C_blood = 3617; % Specific heat of blood
+rho_b = 1050;
 
 % Create grid
 x = linspace(0, Lx, Nx);
@@ -23,7 +27,7 @@ u_new = u;
 source_amplitude = 37;
 source_center_x = Lx / 2;
 source_center_y = Ly / 2;
-source_width = 0.1;
+source_width = 20;
 source = @(x, y, t) source_amplitude * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (2*source_width^2)) * sin(2*pi*t);
 
 % Time-stepping loop with boundary conditions
@@ -41,7 +45,7 @@ for t = 0:dt:T
         for j = 2:Ny-1
             % FTCS scheme for 2D heat equation with source term
             u_new(i, j) = u(i, j) + alpha * dt * ((u(i+1, j) - 2*u(i, j) + u(i-1, j)) / dx^2 + ...
-                (u(i, j+1) - 2*u(i, j) + u(i, j-1)) / dy^2) + dt * source(x(i), y(j), t);
+                (u(i, j+1) - 2*u(i, j) + u(i, j-1)) / dy^2) + dt * (source(x(i), y(j), t) - w_blood * (u(i, j) - 37) * C_blood * rho_b);
         end
     end
     
