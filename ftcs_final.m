@@ -64,7 +64,7 @@ for t = 0:dt:T
             source_term = source(x(i), y(j), t);
             % Pennes' equation with source term
             u_new(i, j) = u(i, j) + alpha * dt * ((u(i+1, j) - 2*u(i, j) + u(i-1, j)) / dx^2 + ...
-                (u(i, j+1) - 2*u(i, j) + u(i, j-1)) / dy^2) + dt * ((source_term - w_blood * (u(i, j) - 37) * C_blood * rho_b) / ( c * rho )); 
+                (u(i, j+1) - 2*u(i, j) + u(i, j-1)) / dy^2) + (dt/(c*rho)) * (source_term - w_blood * (37 - u(i, j)) * C_blood * rho_b); 
         end
     end
     
