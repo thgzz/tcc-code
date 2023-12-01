@@ -4,7 +4,7 @@ Lx = 0.15;         % Length of the domain in the x-direction
 Ly = 0.15;         % Length of the domain in the y-direction
 Nx = 500;        % Number of grid points in the x-direction
 Ny = 500;        % Number of grid points in the y-direction
-T = 60;        % Total simulation time
+T = 180;        % Total simulation time
 dx = Lx / (Nx - 1);
 dy = Ly / (Ny - 1);
 
@@ -34,7 +34,7 @@ u_new = u;
 
 % Define a source term function (e.g., a Gaussian source)
 r = Lx / 2;
-r0 = 0.01;
+r0 = 10e-3;
 A = 1.3e6;
 % y moves in x and x moves in y
 source_center_x = Lx / 2;
@@ -70,18 +70,10 @@ for t = 0:dt:T
     
     % Swap u and u_new for the next time step
     u = u_new;
-    
-    % Visualization (optional)
-    % if mod(t, 0.1) == 0  % Plot every 0.01 seconds
-    %     contourf(X, Y, u, 20, 'EdgeColor', 'none');
-    %     colorbar;
-    %     axis square;
-    %     title(['Time: ' num2str(t)]);
-    %     xlabel('X');
-    %     ylabel('Y');
-    %     drawnow;
-    % end
+
 end
+
+save dados_nano.mat
 
 % Teste
 % surf(X, Y, u, 'EdgeColor', 'none');
@@ -95,18 +87,46 @@ end
 
 
 % Final temperature distribution
+% contourf(X, Y, u, 20, 'EdgeColor', 'none');
+% colorbar;
+% axis square;
+% title('Final Temperature Distribution');
+% xlabel('X');
+% ylabel('Y');
+
+hfig1 = figure;
 contourf(X, Y, u, 20, 'EdgeColor', 'none');
-colorbar;
-axis square;
-title('Final Temperature Distribution');
-xlabel('X');
-ylabel('Y');
+a = colorbar;
+title(a, '$\circ$C', 'Interpreter', 'latex')
+%a.Label.String = 'Temperatura (\circC)';
+xlabel('Comprimento (m)')
+ylabel('Largura (m)')
+% legend('$\sigma$ vari{\''a}vel','$\sigma$ fixo')
+fname = 'myfigure1';
 
-% Define the circle parameters
-% circle_radius = 0.05;
-% circle_center_x = Lx / 2;
-% circle_center_y = Ly / 2;
+picturewidth = 20; % set this parameter and keep it forever
+hw_ratio = 0.65; % feel free to play with this ratio
+set(findall(hfig1,'-property','FontSize'),'FontSize',14) % adjust fontsize to your document
 
-% % Draw the circle
-% rectangle('Position', [circle_center_x - circle_radius, circle_center_y - circle_radius, 2*circle_radius, 2*circle_radius], ...
-%     'Curvature', [1, 1], 'EdgeColor', 'r', 'LineWidth', 2);
+set(findall(hfig1,'-property','Interpreter'),'Interpreter','latex') 
+set(findall(hfig1,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+set(hfig1,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+pos = get(hfig1,'Position');
+set(hfig1,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+
+circle_radius = 0.05;
+circle_radius_2 = 0.02;
+circle_center_x = Lx / 2;
+circle_center_y = Ly / 2;
+
+% Draw the circle
+rectangle('Position', [circle_center_x - circle_radius, circle_center_y - circle_radius, 2*circle_radius, 2*circle_radius], ...
+    'Curvature', [1, 1], 'EdgeColor', 'r', 'LineWidth', 2);
+
+rectangle('Position', [circle_center_x - circle_radius_2, circle_center_y - circle_radius_2, 2*circle_radius_2, 2*circle_radius_2], ...
+    'Curvature', [1, 1], 'EdgeColor', 'r', 'LineWidth', 2);
+
+
+print(hfig1,fname,'-dpdf','-vector','-bestfit')
+
+
