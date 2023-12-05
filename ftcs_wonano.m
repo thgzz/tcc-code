@@ -19,7 +19,8 @@ rho_b = 1050;
 % Stability
 % st = (alpha*dt)/dx^2;
 m = 0.25;
-% D = (w_blood * rho_b * C_blood) / (rho * c);
+D = (w_blood * rho_b * C_blood) / (rho * c);
+% dt = m / (alpha/dx^2+D/4)
 dt = (m*dx^2)/alpha;
 
 % Create grid
@@ -33,13 +34,18 @@ u_new = u;
 
 % Define a source term function (e.g., a Gaussian source)
 r = Lx / 2;
-r0 = 10e-3; % nano spread r0 = 10mm
-A = 1.3e6;
+sigma = 0.34;
+E = 3e3;
 % y moves in x and x moves in y
 source_center_x = Lx / 2;
 source_center_y = Ly / 2;
+source_width = 0.01;
 
-source = @(x, y, t) A * exp( -( (x - r).^2 + (y - source_center_y).^2 ) / r0^2);
+% source = @(x, y, t) A * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (r0^2));
+% source = @(x, y, t) A * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (r0^2)) * sin(2*pi*t);
+% source = @(x, y, t) A * exp( -( (x - r).^2 + (y - source_center_y).^2 ) / r0^2);
+% source = @(x, y, t) source_amplitude * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (2*source_width^2)) * sin(2*pi*t);
+source = @(x, y, t) sigma*(E^2/2) * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (2*source_width^2));
 
     % Apply boundary conditions
     u_new(1, :) = 37;  % Dirichlet boundary condition on the left (top)
@@ -67,36 +73,50 @@ for t = 0:dt:T
     
     % Swap u and u_new for the next time step
     u = u_new;
-
+    
 end
-%%%% Salvar dados %%%%
-save dados_nano.mat
 
-%%%% Plots %%%%
+save dados.mat
 
-hfig1 = figure;
-contourf(X, Y, u, 20, 'EdgeColor', 'none');
+% Teste
 % surf(X, Y, u, 'EdgeColor', 'none');
+% xlabel('$x$', 'Interpreter', 'latex', 'FontSize', 14);
+% ylabel('$y$', 'Interpreter', 'latex', 'FontSize', 14);
+% zlabel('Temperature', 'Interpreter', 'latex', 'FontSize', 14);
+% title('2D Heat Equation Solution (FTCS Method)', 'Interpreter', 'latex', 'FontSize', 16);
+% colormap('jet');
+% colorbar;
+% view(3);
+
+% Final temperature distribution
+% contourf(X, Y, u, 20, 'EdgeColor', 'none');
+% colorbar;
+% axis square;
+% title('Final Temperature Distribution');
+% xlabel('X');
+% ylabel('Y');
+
+hfig2 = figure;
+contourf(X, Y, u, 20, 'EdgeColor', 'none');
 a = colorbar;
-%title(a, '$\circ$C', 'Interpreter', 'latex')
+title(a, '$\circ$C', 'Interpreter', 'latex')
 axis square;
-% colormap('jet') % for surf
-a.Label.String = 'Temperatura (\circC)';
 xlabel('Comprimento (m)')
 ylabel('Largura (m)')
 % legend('$\sigma$ vari{\''a}vel','$\sigma$ fixo')
-fname = 'myfigure1';
+fname2 = 'myfigure2';
 
 picturewidth = 20; % set this parameter and keep it forever
 hw_ratio = 0.65; % feel free to play with this ratio
-set(findall(hfig1,'-property','FontSize'),'FontSize',14) % adjust fontsize to your document
+set(findall(hfig2,'-property','FontSize'),'FontSize',14) % adjust fontsize to your document
 
-set(findall(hfig1,'-property','Interpreter'),'Interpreter','latex') 
-set(findall(hfig1,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
-set(hfig1,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
-pos = get(hfig1,'Position');
-set(hfig1,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
+set(findall(hfig2,'-property','Interpreter'),'Interpreter','latex') 
+set(findall(hfig2,'-property','TickLabelInterpreter'),'TickLabelInterpreter','latex')
+set(hfig2,'Units','centimeters','Position',[3 3 picturewidth hw_ratio*picturewidth])
+pos = get(hfig2,'Position');
+set(hfig2,'PaperPositionMode','Auto','PaperUnits','centimeters','PaperSize',[pos(3), pos(4)])
 
+% Define the circle parameters
 circle_radius = 0.05;
 circle_radius_2 = 0.02;
 circle_center_x = Lx / 2;
@@ -110,7 +130,5 @@ rectangle('Position', [circle_center_x - circle_radius_2, circle_center_y - circ
     'Curvature', [1, 1], 'EdgeColor', 'r', 'LineWidth', 2);
 
 
-% print(hfig1,fname,'-dpdf','-painters')
-print(hfig1,fname,'-dpdf','-painters','-bestfit')
-
+print(hfig2,fname2,'-dpdf','-vector','-bestfit')
 
