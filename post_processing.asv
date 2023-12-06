@@ -20,15 +20,11 @@ T_x = Tm(250,:);
 
 T184 = Tm(250,184);
 
-r_187 = round(x(187),3)
-R = 2;
-r = 1.9;
-anlA = pi*(R^2-r^2)
+r_diff = x(187)-x(184);
+r = 2/100;
+anlA = pi*(r^2-r_diff^2)
 
-AR = 12.57;
-Ar = 11.34;
-
-rDiff = 100*(AR-Ar)/Ar
+disp(r_diff)
 
 
 % hfig = figure;
