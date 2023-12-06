@@ -101,6 +101,7 @@ contourf(X, Y, u, 20, 'EdgeColor', 'none');
 a = colorbar;
 title(a, '$\circ$C', 'Interpreter', 'latex')
 axis square;
+a.Label.String = 'Temperatura (\circC)';
 xlabel('Comprimento (m)')
 ylabel('Largura (m)')
 % legend('$\sigma$ vari{\''a}vel','$\sigma$ fixo')
