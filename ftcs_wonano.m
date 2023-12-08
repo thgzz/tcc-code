@@ -97,7 +97,7 @@ contourf(X, Y, u, 20, 'EdgeColor', 'none');
 a = colorbar;
 axis square;
 a.Label.String = 'Temperatura (\circC)';
-a.Ticks = [0:10:110];
+a.Ticks = 0:10:100;
 clim([37 100]);
 xlabel('Comprimento (m)')
 ylabel('Largura (m)')

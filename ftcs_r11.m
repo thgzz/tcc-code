@@ -17,9 +17,7 @@ C_blood = 3617; % Specific heat of blood
 rho_b = 1050;
 
 % Stability
-% st = (alpha*dt)/dx^2;
 m = 0.25;
-% D = (w_blood * rho_b * C_blood) / (rho * c);
 dt = (m*dx^2)/alpha;
 
 % Create grid
@@ -28,12 +26,12 @@ y = linspace(0, Ly, Ny);
 [X, Y] = meshgrid(x, y);
 
 % Initialize temperature field
-u = 37 * ones(Nx, Ny);
-u_new = u;
+u2 = 37 * ones(Nx, Ny);
+u_new = u2;
 
 % Define a source term function (e.g., a Gaussian source)
 r = Lx / 2;
-r0 = 10e-3; % nano spread r0 = 10mm
+r0 = 11e-3; % nano spread r0 = 10mm
 A = 1.3e6;
 % y moves in x and x moves in y
 source_center_x = Lx / 2;
@@ -43,12 +41,10 @@ source = @(x, y, t) A * exp( -( (x - r).^2 + (y - source_center_y).^2 ) / r0^2);
 
     % Apply boundary conditions
     u_new(1, :) = 37;  % Dirichlet boundary condition on the left (top)
-    % u_new(:, 1) = 37;  % Dirichlet boundary condition on the bottom (left)
     u_new(:, end) = 37; % (right)
     u_new(end, :) = 37;  % Dirichlet boundary condition on the right (bottom)
     
     % Neumann boundary condition on the top (zero gradient) (right)
-    % u_new(:, end) = u_new(:, end-1); 
     u_new(:, 1) = u_new(:,2); % (left)
 
 tic
@@ -62,23 +58,22 @@ for t = 0:dt:T
             % Source
             source_term = source(x(i), y(j), t);
             % Pennes' equation with source term
-            u_new(i, j) = u(i, j) + alpha * dt * ((u(i+1, j) - 2*u(i, j) + u(i-1, j)) / dx^2 + ...
-                (u(i, j+1) - 2*u(i, j) + u(i, j-1)) / dy^2) + (dt/(c*rho)) * (source_term - w_blood * (37 - u(i, j)) * C_blood * rho_b); 
+            u_new(i, j) = u2(i, j) + alpha * dt * ((u2(i+1, j) - 2*u2(i, j) + u2(i-1, j)) / dx^2 + ...
+                (u2(i, j+1) - 2*u2(i, j) + u2(i, j-1)) / dy^2) + (dt/(c*rho)) * (source_term - w_blood * (37 - u2(i, j)) * C_blood * rho_b); 
         end
     end
     
     % Swap u and u_new for the next time step
-    u = u_new;
+    u2 = u_new;
 
 end
 %%%% Salvar dados %%%%
-save dados_nano.mat
+save dados_nanor11.mat
 toc
 %%%% Plots %%%%
 
 hfig1 = figure;
-contourf(X, Y, u, 20, 'EdgeColor', 'none');
-% surf(X, Y, u, 'EdgeColor', 'none');
+contourf(X, Y, u2, 20, 'EdgeColor', 'none');
 a = colorbar;
 axis square;
 a.Label.String = 'Temperatura (\circC)';
@@ -86,7 +81,7 @@ a.Ticks = 0:10:100;
 clim([37 100]);
 xlabel('Comprimento (m)')
 ylabel('Largura (m)')
-fname = 'myfigure1';
+fname = 'myfigure3';
 
 picturewidth = 20; % set this parameter and keep it forever
 hw_ratio = 0.65; % feel free to play with this ratio
