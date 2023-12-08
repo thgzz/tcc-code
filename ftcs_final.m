@@ -43,11 +43,13 @@ source = @(x, y, t) A * exp( -( (x - r).^2 + (y - source_center_y).^2 ) / r0^2);
 
     % Apply boundary conditions
     u_new(1, :) = 37;  % Dirichlet boundary condition on the left (top)
-    u_new(:, 1) = 37;  % Dirichlet boundary condition on the bottom (left)
+    % u_new(:, 1) = 37;  % Dirichlet boundary condition on the bottom (left)
+    u_new(:, end) = 37; % (right)
     u_new(end, :) = 37;  % Dirichlet boundary condition on the right (bottom)
     
     % Neumann boundary condition on the top (zero gradient) (right)
-    u_new(:, end) = u_new(:, end-1); 
+    % u_new(:, end) = u_new(:, end-1); 
+    u_new(:, 1) = u_new(:,2); % (left)
 
 
 % Time-stepping loop with boundary conditions
@@ -78,13 +80,12 @@ hfig1 = figure;
 contourf(X, Y, u, 20, 'EdgeColor', 'none');
 % surf(X, Y, u, 'EdgeColor', 'none');
 a = colorbar;
-%title(a, '$\circ$C', 'Interpreter', 'latex')
 axis square;
-% colormap('jet') % for surf
 a.Label.String = 'Temperatura (\circC)';
+a.Ticks = [0:10:100];
+clim([37 100]);
 xlabel('Comprimento (m)')
 ylabel('Largura (m)')
-% legend('$\sigma$ vari{\''a}vel','$\sigma$ fixo')
 fname = 'myfigure1';
 
 picturewidth = 20; % set this parameter and keep it forever

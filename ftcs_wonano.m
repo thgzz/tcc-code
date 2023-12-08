@@ -41,10 +41,6 @@ source_center_x = Lx / 2;
 source_center_y = Ly / 2;
 source_width = 0.01;
 
-% source = @(x, y, t) A * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (r0^2));
-% source = @(x, y, t) A * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (r0^2)) * sin(2*pi*t);
-% source = @(x, y, t) A * exp( -( (x - r).^2 + (y - source_center_y).^2 ) / r0^2);
-% source = @(x, y, t) source_amplitude * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (2*source_width^2)) * sin(2*pi*t);
 source = @(x, y, t) sigma*(E^2/2) * exp(-((x - source_center_x).^2 + (y - source_center_y).^2) / (2*source_width^2));
 
     % Apply boundary conditions
@@ -99,12 +95,12 @@ save dados.mat
 hfig2 = figure;
 contourf(X, Y, u, 20, 'EdgeColor', 'none');
 a = colorbar;
-title(a, '$\circ$C', 'Interpreter', 'latex')
 axis square;
 a.Label.String = 'Temperatura (\circC)';
+a.Ticks = [0:10:110];
+clim([37 100]);
 xlabel('Comprimento (m)')
 ylabel('Largura (m)')
-% legend('$\sigma$ vari{\''a}vel','$\sigma$ fixo')
 fname2 = 'myfigure2';
 
 picturewidth = 20; % set this parameter and keep it forever
