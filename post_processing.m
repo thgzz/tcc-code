@@ -46,7 +46,7 @@ ylim([30 110])
 xticks([0:0.05:0.15]);
 xtickformat('%.2f');
 xlabel('Comprimento (m)')
-ylabel('Largura (m)')
+ylabel('Temperatura (°C)')
 xline(5.5/100,'k--','Limite do tumor','LineWidth',1,'HandleVisibility','off')
 xline(9.5/100,'k--','Limite do tumor','LineWidth',1,'HandleVisibility','off')
 yline(41,'r--','Necrose celular','HandleVisibility','off')
